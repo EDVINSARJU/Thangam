@@ -939,139 +939,61 @@ def generate_pdf_bill(request, payment_id):
 
 
 
-from django.shortcuts import render, redirect
-from .models import Product, GoldItemNew
-from sklearn.linear_model import LinearRegression
-import numpy as np
-from django.http import JsonResponse
-
-
-
-# Load the dataset from the CSV file in your PyCharm project directory
-csv_file_path = r'C:\Users\EDVIN SARJU\PycharmProjects\pythonProject1\gold_purity_dataset.csv'
-data = pd.read_csv(csv_file_path)
-
-# Train the linear regression model
-model = LinearRegression()
-model.fit(data[['Weight (grams)', 'Volume (cm³)']], data['Purity Percentage (%)'])
-
 def add_product(request):
     if request.method == 'POST':
-        # Extract data from the form 
-        gold_weight = float(request.POST.get('gold-weight', 0))  # Extract gold weight from POST data
-        volume = float(request.POST.get('volume', 0))
-        
-        # Validate user input
-        if gold_weight <= 0 or volume <= 0:
-            raise ValueError("Gold weight and volume must be positive.")
-            
-        # Calculate density of gold alloy
-        gold_value_str = request.POST.get('gold-value', '')  # Get gold value as string
-        gold_value = float(gold_value_str) if gold_value_str else 0
-        
-        density_gold_alloy = gold_weight / volume
-        
-        # Make prediction using the trained model
-        predicted_purity_percentage = model.predict([[gold_weight, volume]])[0]
-        
-        # Calculate predicted purity percentage using the formula
-        density_pure_gold = 19.32  # Assuming density of pure gold is 19.32 g/cm³
-        predicted_purity_percentage = (density_gold_alloy/density_pure_gold ) * 100
-        
-       
-     
-        if gold_value < 0:
-            raise ValueError("Gold value must be non-negative.")
-       
-        # Determine purity category based on predicted purity
-        if predicted_purity_percentage >= 95:
-            purity_of_gold = '24k'
-        elif predicted_purity_percentage >= 91:
-            purity_of_gold = '22k'
-        else:
-            purity_of_gold = '18k'
-        
-        
+        # Handle the form submission
+        product_name = request.POST.get('product-name')
+        category = request.POST.get('category-name')
+        subcategory = request.POST.get('subcategory-name')
+        quantity = request.POST.get('quantity')
+        description = request.POST.get('description')
+        price = float(request.POST.get('price', 0))
+        discount = float(request.POST.get('discount', 0))
+        status = request.POST.get('status')
+        product_image = request.FILES.get('product-image')
+        making_charge = float(request.POST.get('making-charge', 0))
+        gold_value = float(request.POST.get('gold-value', 0))
+        stone_cost = float(request.POST.get('stone-cost', 0))
+        gst_rate = float(request.POST.get('gst-rate', 0))
+        gold_weight = float(request.POST.get('gold-weight', 0))  # Fetch gold_weight from the form
+
+        # Calculate discounted price
+        discounted_price = price - (price * (discount / 100))
+
+        # Calculate sale_price
+        sale_price = discounted_price + making_charge + (gold_value * gold_weight) + stone_cost  # Include gold_weight in the calculation
+
+        # Calculate GST amount
+        gst_amount = sale_price * (gst_rate / 100)
+
+        # Calculate sale_price_with_gst
+        sale_price_with_gst = sale_price + gst_amount
+
+        # Retrieve the purity of gold
+        purity_of_gold = request.POST.get('purity-of-gold')
+
+        # Create a new Product object and save it to the database
         product = Product(
-            product_name=request.POST.get('product-name'),
-            category=request.POST.get('category-name'),
-            subcategory=request.POST.get('subcategory-name'),
-            quantity=request.POST.get('quantity'),
-            description=request.POST.get('description'),
-            status=request.POST.get('status'),
-            product_image=request.FILES.get('product-image'),
-            price=float(request.POST.get('price', 0)),
-            discount=float(request.POST.get('discount', 0)),
-            making_charge=float(request.POST.get('making-charge', 0)),
-            gold_value=gold_value, 
-            stone_cost=float(request.POST.get('stone-cost', 0)),
-            gst_rate=float(request.POST.get('gst-rate', 0)),
-            sale_price=float(request.POST.get('price', 0)) - (float(request.POST.get('price', 0)) * (float(request.POST.get('discount', 0)) / 100)) + float(request.POST.get('making-charge', 0)) + (float(request.POST.get('gold-value', 0)) * float(request.POST.get('gold-weight', 0))) + float(request.POST.get('stone-cost', 0)),
-            purity_of_gold=purity_of_gold,  # Use determined purity here
-            gold_weight=gold_weight,
-            density_gold_alloy=density_gold_alloy,  # Use calculated density here
-            predicted_purity_percentage=predicted_purity_percentage  # Save predicted purity percentage
+            product_name=product_name,
+            category=category,
+            subcategory=subcategory,
+            quantity=quantity,
+            description=description,
+            price=price,
+            discount=discount,
+            sale_price=sale_price_with_gst,
+            status=status,
+            product_image=product_image,
+            purity_of_gold=purity_of_gold,
+            making_charge=making_charge,
+            gold_value=gold_value,
+            stone_cost=stone_cost,
+            gst_rate=gst_rate,
+            gold_weight=gold_weight,  # Include gold_weight in the model field
         )
         product.save()
-        
-        # Save gold item data
-        gold_item = GoldItemNew(
-            product=product,
-            weight=gold_weight,
-            volume=volume,
-            predicted_purity_percentage=predicted_purity_percentage 
-        )
-        gold_item.save()
 
-        return redirect('adminpage')  # Redirect to admin page after successful addition
+        # Redirect to a success page or any other desired action
+        return redirect('adminpage')
 
     return render(request, 'adminpage.html')
-
-
-
-
-def golditem_list(request):
-    # Retrieve all GoldItemNew objects from the database
-    gold_items = GoldItemNew.objects.all()
-
-    # Update predicted purity percentage for each GoldItemNew instance
-    for item in gold_items:
-        # Calculate predicted purity percentage using the formula
-        density_pure_gold = 19.32  # Assuming density of pure gold is 19.32 g/cm³
-        density_gold_alloy = item.weight / item.volume
-        predicted_purity_percentage = ( density_gold_alloy/density_pure_gold ) * 100
-        # Update the predicted_purity_percentage field for the current item
-        item.predicted_purity_percentage = predicted_purity_percentage
-        item.save()
-
-    # Pass gold_items queryset to the template context
-    return render(request, 'calculate_purity.html', {'gold_items': gold_items})
-
-
-
-
-def predict_purity(request):
-    if request.method == 'POST':
-        weight = float(request.POST.get('weight'))
-        volume = float(request.POST.get('volume'))
-        
-        # Assuming you have trained a linear regression model and stored it in a variable called 'model'
-        predicted_purity = model.predict(np.array([[weight, volume]]))[0]
-        
-        # Create a new GoldItemNew instance and save it
-        gold_item = GoldItemNew(weight=weight, volume=volume, predicted_purity_percentage=predicted_purity)
-        gold_item.save()
-        
-        return render(request, 'calculate_purity.html')
-
-
-    
-
-# views.py
-import pandas as pd
-from django.http import JsonResponse
-
-def load_csv_data(request):
-    csv_file_path = r'C:\Users\EDVIN SARJU\PycharmProjects\pythonProject1\gold_purity_dataset.csv'
-    data = pd.read_csv(csv_file_path)
-    return JsonResponse(data.to_dict('records'), safe=False)

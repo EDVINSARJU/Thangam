@@ -51,8 +51,7 @@ urlpatterns = [
     path('manage/', views.manage, name='manage'), 
     path('payment_success/', views.payment_success, name='payment_success'),
     path('generate-pdf-bill/<int:payment_id>/', views.generate_pdf_bill, name='generate_pdf_bill'),
-    path('predict_purity/', views.predict_purity, name='calculate_purity'),
-    path('calculate_purity', views.golditem_list, name='calculate_purity'), 
+    
  ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
