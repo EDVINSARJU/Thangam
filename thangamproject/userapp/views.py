@@ -938,11 +938,10 @@ def generate_pdf_bill(request, payment_id):
 
 
 
-import pandas as pd
 from django.shortcuts import render, redirect
 from .models import Product, GoldItemNew
-from sklearn.linear_model import LinearRegression
-import numpy as np
+
+
 from django.http import JsonResponse
 
 
