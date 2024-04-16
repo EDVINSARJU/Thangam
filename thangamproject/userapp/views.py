@@ -1061,7 +1061,7 @@ def predict_purity(request):
     
 
 # views.py
-import pandas as pd
+
 from django.http import JsonResponse
 
 
