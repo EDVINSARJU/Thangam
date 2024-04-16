@@ -52,7 +52,6 @@ urlpatterns = [
     path('payment_success/', views.payment_success, name='payment_success'),
     path('generate-pdf-bill/<int:payment_id>/', views.generate_pdf_bill, name='generate_pdf_bill'),
     path('predict_purity/', views.predict_purity, name='calculate_purity'),
-    path('load-csv-data/', views.load_csv_data, name='load_csv_data'),
     path('calculate_purity', views.golditem_list, name='calculate_purity'), 
  ]
 if settings.DEBUG:

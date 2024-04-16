@@ -947,8 +947,6 @@ from django.http import JsonResponse
 
 
 
-
-
 def add_product(request):
     if request.method == 'POST':
         # Extract data from the form 
@@ -1058,4 +1056,4 @@ def predict_purity(request):
         return render(request, 'calculate_purity.html')
 
 
-    
+
