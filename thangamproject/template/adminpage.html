@@ -540,38 +540,7 @@
             // Call the function to populate the options when the page loads
             populateGoldPurityOptions();
 
-            function calculatePurity() {
-                const goldWeight = parseFloat(document.getElementById('gold-weight').value) || 0;
-                const volume = parseFloat(document.getElementById('volume').value) || 0;
-            
-                fetch('/load-csv-data/')  // Use the URL endpoint defined in Django
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        const matchingRow = data.find(row => row['Weight (grams)'] === goldWeight.toString() && row['Volume (cm³)'] === volume.toString());
-                        if (matchingRow) {
-                            const predicted_purity_percentage = Math.min(matchingRow['Purity Percentage  (%)'], 100); // Limit to a maximum of 100%
-                            document.getElementById('purity-result').innerText = `Predicted Purity Percentage: ${predicted_purity_percentage}%`;
-                        } else {
-                            const density_gold_alloy = goldWeight / volume;
-                            const predicted_purity_percentage = Math.min((density_gold_alloy / 19.32) * 100, 100); // Limit to a maximum of 100%
-                            if (predicted_purity_percentage <= 100) {
-                                document.getElementById('purity-result').innerText = `Predicted Purity Percentage: ${predicted_purity_percentage}%`;
-                            } else {
-                                document.getElementById('purity-result').innerText = "Error: Predicted purity percentage is above 100%. Check input values.";
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching CSV data:', error); // Error handling
-                        document.getElementById('purity-result').innerText = "Error fetching data.";
-                    });
-            }
-            
+          
             
             
             
