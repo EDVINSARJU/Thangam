@@ -947,6 +947,14 @@ from django.http import JsonResponse
 
 
 
+# Load the dataset from the CSV file in your PyCharm project directory
+csv_file_path = r'C:\Users\EDVIN SARJU\PycharmProjects\pythonProject1\gold_purity_dataset.csv'
+data = pd.read_csv(csv_file_path)
+
+# Train the linear regression model
+model = LinearRegression()
+model.fit(data[['Weight (grams)', 'Volume (cm³)']], data['Purity Percentage (%)'])
+
 def add_product(request):
     if request.method == 'POST':
         # Extract data from the form 
@@ -964,7 +972,7 @@ def add_product(request):
         density_gold_alloy = gold_weight / volume
         
         # Make prediction using the trained model
-      
+        predicted_purity_percentage = model.predict([[gold_weight, volume]])[0]
         
         # Calculate predicted purity percentage using the formula
         density_pure_gold = 19.32  # Assuming density of pure gold is 19.32 g/cm³
@@ -1048,12 +1056,22 @@ def predict_purity(request):
         volume = float(request.POST.get('volume'))
         
         # Assuming you have trained a linear regression model and stored it in a variable called 'model'
+        predicted_purity = model.predict(np.array([[weight, volume]]))[0]
         
         # Create a new GoldItemNew instance and save it
-        gold_item = GoldItemNew(weight=weight, volume=volume)
+        gold_item = GoldItemNew(weight=weight, volume=volume, predicted_purity_percentage=predicted_purity)
         gold_item.save()
         
         return render(request, 'calculate_purity.html')
 
 
+    
 
+# views.py
+import pandas as pd
+from django.http import JsonResponse
+
+def load_csv_data(request):
+    csv_file_path = r'C:\Users\EDVIN SARJU\PycharmProjects\pythonProject1\gold_purity_dataset.csv'
+    data = pd.read_csv(csv_file_path)
+    return JsonResponse(data.to_dict('records'), safe=False)
