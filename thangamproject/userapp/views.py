@@ -949,7 +949,7 @@ from django.http import JsonResponse
 
 # Load the dataset from the CSV file in your PyCharm project directory
 csv_file_path = r''
-data = pd.read_csv(csv_file_path)
+
 
 # Train the linear regression model
 model = LinearRegression()
