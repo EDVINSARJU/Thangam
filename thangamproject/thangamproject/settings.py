@@ -18,6 +18,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-an-pd5u(2o9_5rr+fa^sg1qzk5$fypdqre=!^ud74q31cg5j15'
@@ -27,6 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+
+# Application definition
 
 INSTALLED_APPS = [
     'userapp',
@@ -38,7 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+# settings.py
 
+# Define the media root and URL
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -74,7 +80,8 @@ WSGI_APPLICATION = 'thangamproject.wsgi.application'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-
+# Database
+# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -120,8 +127,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-csv_file_path = os.path.join(BASE_DIR, 'path', 'to', 'gold_purity_dataset.csv')
+# settings.py
 
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -142,10 +151,13 @@ EMAIL_HOST_PASSWORD = 'gotfxyhjfyqtjvlz'
 DEFAULT_FROM_EMAIL = 'poojasarju73@gmail.com'
 
 
+
+
+
+# settings.py
 STRIPE_PUBLIC_KEY = 'your_stripe_public_key'
 STRIPE_SECRET_KEY = 'your_stripe_secret_key'
 
 
-RAZOR_KEY_ID= 'rzp_test_5OGrrBXThwEo2X'
-RAZOR_KEY_SECRET = 'MhV549SUQ68DSNfl8SgBuBUl'
-
+RAZORPAY_API_KEY= 'rzp_test_5OGrrBXThwEo2X'
+RAZORPAY_API_SECRET = 'MhV549SUQ68DSNfl8SgBuBUl'

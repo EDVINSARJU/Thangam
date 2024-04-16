@@ -88,109 +88,111 @@
             </div>
         </div>
     </section>
-    <div class="form-container" id="product-form">
-      <form action="{% if product.product_id %}{% url 'edit_product' product_id=product.product_id %}{% else %}{% url 'add_product' %}{% endif %}" method="post" enctype="multipart/form-data" onsubmit="return validateProductForm();">
+      <div class="form-container" id="product-form">
+        <form action="{% if product.product_id %}{% url 'edit_product' product_id=product.product_id %}{% else %}{% url 'add_product' %}{% endif %}" method="post" enctype="multipart/form-data" onsubmit="return validateProductForm();">
+
           {% csrf_token %}
+    
           <div class="form-group">
-              <label for="product-name">Product Name</label>
-              <input type="text" id="product-name" name="product-name" class="form-control" value="{{ product.product_name }}" required>
+            <label for="product-name">Product Name</label>
+            <input type="text" id="product-name" name="product-name" class="form-control" value="{{ product.product_name }}" required>
           </div>
-  
+    
           <div class="form-group">
-              <label for="category-name">Category Name</label>
-              <select id="category-name" name="category-name" class="form-control" required>
-                  <!-- Add options dynamically based on your categories -->
-                  <option value="gold" {% if product.category == 'gold' %}selected{% endif %}>Gold</option>
-                  <option value="diamond" {% if product.category == 'diamond' %}selected{% endif %}>Diamond</option>
-                  <option value="platinum" {% if product.category == 'platinum' %}selected{% endif %}>Platinum</option>
-              </select>
+            <label for="category-name">Category Name</label>
+            <select id="category-name" name="category-name" class="form-control" required>
+              <!-- Add options dynamically based on your categories -->
+              <option value="gold" {% if product.category == 'gold' %}selected{% endif %}>Gold</option>
+              <option value="diamond" {% if product.category == 'diamond' %}selected{% endif %}>Diamond</option>
+              <option value="platinum" {% if product.category == 'platinum' %}selected{% endif %}>Platinum</option>
+            </select>
           </div>
-  
+    
           <div class="form-group">
-              <label for="subcategory-name">Subcategory Name</label>
-              <select id="subcategory-name" name="subcategory-name" class="form-control" required>
-                  <!-- Add options dynamically based on the selected category -->
-                  <!-- You can use JavaScript to update subcategories based on the selected category -->
-                  <option value="{{ product.subcategory }}" selected>{{ product.subcategory }}</option>
-              </select>
+            <label for="subcategory-name">Subcategory Name</label>
+            <select id="subcategory-name" name="subcategory-name" class="form-control" required>
+              <!-- Add options dynamically based on the selected category -->
+              <!-- You can use JavaScript to update subcategories based on the selected category -->
+              <option value="{{ product.subcategory }}" selected>{{ product.subcategory }}</option>
+            </select>
           </div>
-  
+    
           <div class="form-group">
-              <label for="purity-of-gold">Purity of Gold</label>
-              <select id="purity-of-gold" name="purity-of-gold" class="form-control" required>
-                  <option value="18k" {% if product.purity_of_gold == '18k' %}selected{% endif %}>18k</option>
-                  <option value="22k" {% if product.purity_of_gold == '22k' %}selected{% endif %}>22k</option>
-                  <option value="24k" {% if product.purity_of_gold == '24k' %}selected{% endif %}>24k</option>
-              </select>
+            <label for="purity-of-gold">Purity of Gold</label>
+            <select id="purity-of-gold" name="purity-of-gold" class="form-control" required>
+              <option value="18k" {% if product.purity_of_gold == '18k' %}selected{% endif %}>18k</option>
+              <option value="22k" {% if product.purity_of_gold == '22k' %}selected{% endif %}>22k</option>
+              <option value="24k" {% if product.purity_of_gold == '24k' %}selected{% endif %}>24k</option>
+            </select>
           </div>
-  
+    
           <div class="form-group">
-              <label for="quantity">Quantity</label>
-              <input type="number" id="quantity" name="quantity" class="form-control" value="{{ product.quantity }}" required>
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" name="quantity" class="form-control" value="{{ product.quantity }}" required>
           </div>
-  
+    
           <div class="form-group">
-              <label for="description">Description</label>
-              <textarea id="description" name="description" class="form-control" required>{{ product.description }}</textarea>
+            <label for="description">Description</label>
+            <textarea id="description" name="description" class="form-control" required>{{ product.description }}</textarea>
           </div>
-  
+    
           <div class="form-group">
-              <label for="price">Product Price</label>
-              <input type="number" id="price" name="price" class="form-control" value="{{ product.price }}" required>
+            <label for="price">Product Price</label>
+            <input type="number" id="price" name="price" class="form-control" value="{{ product.price }}" required>
           </div>
-  
+    
           <div class="form-group">
-              <label for="discount">Discount (%)</label>
-              <input type="number" id="discount" name="discount" class="form-control" value="{{ product.discount }}">
+            <label for="discount">Discount (%)</label>
+            <input type="number" id="discount" name="discount" class="form-control" value="{{ product.discount }}">
           </div>
-  
+    
           <div class="form-group">
-              <label for="making-charge">Making Charge</label>
-              <input type="number" id="making-charge" name="making-charge" class="form-control" value="{{ product.making_charge }}" oninput="calculateTotalPrice()">
+            <label for="making-charge">Making Charge</label>
+            <input type="number" id="making-charge" name="making-charge" class="form-control" value="{{ product.making_charge }}" oninput="calculateTotalPrice()">
           </div>
-  
+    
           <div class="form-group">
-              <label for="gold-value">Gold Value</label>
-              <input type="number" id="gold-value" name="gold-value" class="form-control" value="{{ product.gold_value }}" oninput="calculateTotalPrice()">
-          </div>
-          <div class="form-group">
-              <label for="gold-weight">Gold Weight (grams)</label>
-              <input type="number" id="gold-weight" name="gold-weight" class="form-control" value="{{ product.gold_weight }}" oninput="calculateTotalPrice()">
+            <label for="gold-value">Gold Value</label>
+            <input type="number" id="gold-value" name="gold-value" class="form-control" value="{{ product.gold_value }}" oninput="calculateTotalPrice()">
           </div>
           <div class="form-group">
-              <label for="stone-cost">Stone Cost</label>
-              <input type="number" id="stone-cost" name="stone-cost" class="form-control" value="{{ product.stone_cost }}" oninput="calculateTotalPrice()">
-          </div>
-  
+            <label for="gold-weight">Gold Weight (grams)</label>
+            <input type="number" id="gold-weight" name="gold-weight" class="form-control" value="{{ product.gold_weight }}" oninput="calculateTotalPrice()">
+        </div>
+    
           <div class="form-group">
-              <label for="gst-rate">GST Rate (%)</label>
-              <input type="number" id="gst-rate" name="gst-rate" class="form-control" value="{{ product.gst_rate }}" oninput="calculateTotalPrice()">
+            <label for="stone-cost">Stone Cost</label>
+            <input type="number" id="stone-cost" name="stone-cost" class="form-control" value="{{ product.stone_cost }}" oninput="calculateTotalPrice()">
           </div>
-  
+    
           <div class="form-group">
-              <label for="sale-price">Total Price</label>
-              <input type="number" id="sale-price" name="sale-price" class="form-control" value="{{ product.sale_price }}" readonly>
+            <label for="gst-rate">GST Rate (%)</label>
+            <input type="number" id="gst-rate" name="gst-rate" class="form-control" value="{{ product.gst_rate }}" oninput="calculateTotalPrice()">
           </div>
-  
+    
           <div class="form-group">
-              <label for="status">Status</label>
-              <select id="status" name="status" class="form-control" required>
-                  <option value="active" {% if product.status == 'active' %}selected{% endif %}>Active</option>
-                  <option value="inactive" {% if product.status == 'inactive' %}selected{% endif %}>Inactive</option>
-              </select>
+            <label for="sale-price">Total Price</label>
+            <input type="number" id="sale-price" name="sale-price" class="form-control" value="{{ product.sale_price }}" readonly>
           </div>
-  
+    
           <div class="form-group">
-              <label for="product-image">Product Image</label>
-              <input type="file" id="product-image" name="product-image" class="form-control" accept="image/*">
+            <label for="status">Status</label>
+            <select id="status" name="status" class="form-control" required>
+              <option value="active" {% if product.status == 'active' %}selected{% endif %}>Active</option>
+              <option value="inactive" {% if product.status == 'inactive' %}selected{% endif %}>Inactive</option>
+            </select>
           </div>
-  
+    
+          <div class="form-group">
+            <label for="product-image">Product Image</label>
+            <input type="file" id="product-image" name="product-image" class="form-control" accept="image/*">
+          </div>
+    
           <button type="submit" class="btn btn-primary">Update Product</button>
-          <a href="{% url "viewproduct" %}" class="btn btn-primary">Cancel</a>
-      </form>
-      <div id="purity-result"></div>
-  </div>
-  
+          <button type="submit" href="{% url "viewproduct" %}" class="btn btn-primary">Cancel</button>
+        </form>
+      </div>
+    
       <script>
         
         function calculateTotalPrice() {
@@ -198,46 +200,53 @@
           var makingCharge = parseFloat(document.getElementById('making-charge').value) || 0;
           var goldValue = parseFloat(document.getElementById('gold-value').value) || 0;
           var goldWeight = parseFloat(document.getElementById('gold-weight').value) || 0;
-          var volume = parseFloat(document.getElementById('volume').value) || 1.0; // Default to 1.0 if not provided
           var stoneCost = parseFloat(document.getElementById('stone-cost').value) || 0;
           var gstRate = parseFloat(document.getElementById('gst-rate').value) || 0;
           var discount = parseFloat(document.getElementById('discount').value) || 0;
   
+          // Calculate discounted price
           var discountedPrice = price - (price * (discount / 100));
   
+          // Calculate sale price
           var salePrice = discountedPrice + makingCharge + (goldValue * goldWeight) + stoneCost;
   
+          // Calculate GST amount
           var gstAmount = salePrice * (gstRate / 100);
   
-      
+          // Calculate sale price with GST
           var salePriceWithGst = salePrice + gstAmount;
   
-          
+          // Display the calculated sale price
           document.getElementById('sale-price').value = salePriceWithGst.toFixed(2);
       }
   
-    
-      var inputElements = document.querySelectorAll('#price, #making-charge, #gold-value, #gold-weight, #volume, #stone-cost, #gst-rate, #discount');
+      // ... (existing JavaScript code)
+  
+      // Attach the calculateTotalPrice function to input events for live updates
+      var inputElements = document.querySelectorAll('#price, #making-charge, #gold-value, #gold-weight, #stone-cost, #gst-rate, #discount');
       inputElements.forEach(function (element) {
           element.addEventListener('input', calculateTotalPrice);
       });
   
-      
+      // Calculate the initial sale price on page load
       calculateTotalPrice();
 
 
+
+
+        // Add any additional JavaScript validation or functionality if needed
         function validateProductForm() {
-           
-            return true; 
+            // Your validation logic goes here
+            return true;  // Return false if the form should not be submitted
         }
     
-       
+        // Attach the calculateTotalPrice function to input events for live updates
         var inputElements = document.querySelectorAll('#price, #making-charge, #gold-value, #stone-cost, #gst-rate, #discount');
         inputElements.forEach(function (element) {
             element.addEventListener('input', calculateTotalPrice);
         });
     
-        
+        // Calculate the initial sale price on page load
         calculateTotalPrice();
     </script>
     

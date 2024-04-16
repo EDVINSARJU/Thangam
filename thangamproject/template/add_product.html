@@ -137,43 +137,7 @@
             margin-left: 20%;
             padding: 20px;
         }
-        /* CSS for the Calculate Gold Purity section */
-.calculate-purity-container {
-    margin-top: 20px;
-}
-
-.calculate-purity-container h2 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
-}
-
-.calculate-purity-container label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.calculate-purity-container input[type="text"] {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.calculate-purity-container button[type="submit"] {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.calculate-purity-container button[type="submit"]:hover {
-    background-color: #45a049;
-}
-
+        
        </style>
 </head>
 
@@ -332,15 +296,7 @@
                             <input type="file" id="product-image" name="product-image" class="form-control" accept="image/*" required onchange="validateProductImage(this)">
                             <span id="product-image-error" class="error-text"></span>
                         </div>
-                        <div class="calculate-purity-container">
-                            <h2>Calculate Gold Purity</h2>
-                            <label for="weight">Weight (g):</label>
-                            <input type="text" name="weight" id="weight" required><br>
-                            <label for="volume">Volume (cm^3):</label>
-                            <input type="text" name="volume" id="volume" required><br>
-                            <button type="submit">Calculate Purity</button>
-                        </div>
-                        
+                       
                         <button type="submit" id="add-product-button" class="btn btn-primary">Add Product</button>
                         
                         <button type="reset" class="btn btn-primary">Reset</button>

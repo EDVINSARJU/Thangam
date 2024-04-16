@@ -6,14 +6,3 @@ urlpatterns = [
     # Add other project-level URLs here
     
 ]
-
-
-
-
-
-# from django.urls import path, include
-
-# urlpatterns = [
-#     path('api/', include('thangamproject.urls')),
-#     # Add more URL patterns as needed
-# ]

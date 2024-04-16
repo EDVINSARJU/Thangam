@@ -58,7 +58,6 @@ class UserProfile(models.Model):
     dob = models.DateField(blank=True, null=True)
     profile_created_at = models.DateTimeField(auto_now_add=True)
     profile_modified_at = models.DateTimeField(auto_now=True)
-    
 
     def calculate_age(self):
         today = date.today()
@@ -79,18 +78,6 @@ class UserProfile(models.Model):
             user_role = 'Customer'
         return user_role
     from django.db import models
-    
-
-
-from django.db import models
-
-class GoldItemNew(models.Model):
-    product = models.OneToOneField('Product', on_delete=models.CASCADE, related_name='gold_item')
-    weight = models.FloatField()
-    volume = models.FloatField()
-    predicted_purity_percentage = models.FloatField(default=0.0)
-
-
 
 class Product(models.Model):
     product_id = models.AutoField(primary_key=True)
@@ -109,10 +96,8 @@ class Product(models.Model):
     stone_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     gst_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     sale_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    gold_weight = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    density_gold_alloy = models.FloatField(null=True, blank=True)
-    predicted_purity_percentage = models.FloatField(default=0.0)
-        
+    gold_weight = models.DecimalField(max_digits=10, decimal_places=2, default=0) # New field for gold weight
+    
     def calculate_sale_price(self):
         if self.discount is not None:
             discounted_price = self.price - (self.price * (self.discount / 100))
@@ -130,12 +115,21 @@ class Product(models.Model):
 
         # Calculate sale price without saving it to the instance
         self.sale_price = self.calculate_sale_price()
-        
+
+        print(f"self.discount: {self.discount}")
+        print(f"self.gold_weight: {self.gold_weight}")
+        print(f"self.price: {self.price}")
+        print(f"self.making_charge: {self.making_charge}")
+        print(f"self.gold_value: {self.gold_value}")
+        print(f"self.stone_cost: {self.stone_cost}")
+        print(f"self.gst_rate: {self.gst_rate}")
+        print(f"self.sale_price: {self.sale_price}")
+
         super(Product, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.product_name
-
+    
     
 from django.db import models
 from django.conf import settings
@@ -148,18 +142,6 @@ class ShoppingCart(models.Model):
 
     def calculate_total_price(self):
         return self.quantity * self.product.sale_price
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -180,6 +162,9 @@ class Subcategory(models.Model):
         return self.name
 
 
+
+
+# models.py
 from django.db import models
 
 class Feedback(models.Model):
@@ -204,19 +189,22 @@ class User(models.Model):
 
 
 
+from django.db import models
+from .models import Product
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
-
-
-
-
-
-
-class Payment(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+class OrderedProduct(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    razorpay_payment_id = models.CharField(max_length=255)
-    razorpay_order_id = models.CharField(max_length=255)
-    razorpay_signature = models.CharField(max_length=255)
-    payment_status = models.CharField(max_length=20)
-    payment_date = models.DateTimeField(auto_now_add=True)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Ordered Product: {self.user.username} - {self.product.product_name}, Total Price: {self.total_price}" 
+
+    def get_username(self):
+        return self.user.username
+
+    def get_product_name(self):
+        return self.product.product_name

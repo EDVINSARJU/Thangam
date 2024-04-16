@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.shortcuts import render
-import razorpay
 from .models import CustomUser,UserProfile
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -13,8 +12,8 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
 from .models import CustomUser
 from .models import *
-from reportlab.pdfgen import canvas
-from thangamproject.settings import BASE_DIR
+
+# views.py
 
 def loginview(request):
     username = request.session.get('username', None)  # Retrieve the username from the session
@@ -57,6 +56,9 @@ def register(request):
 
     return render(request, 'register.html')  # Replace 'registration_page.html' with your actual registration page template
 
+
+
+
 # views.py
 from django.contrib.auth import authenticate, login as auth_login, logout
 from django.http import HttpResponse
@@ -95,6 +97,9 @@ def logout_view(request):
     messages.success(request, "Logged out successfully.")
     return redirect('login')  # Replace 'login' with the URL name of your login page
 
+
+
+
 @login_required(login_url='login')
 def logview(request):
      return render(request,'loginview.html')
@@ -128,6 +133,9 @@ def customer_list(request):
     context = {'user_profiles': customer_users}
     return render(request, 'customer_list.html', context)
 
+
+
+
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -145,7 +153,7 @@ def change_status(request, user_id):
             # Send an activation email
             subject = 'Account Activation'
             message = render_to_string('activation_email.html', {'user': user})
-            from_email = 'mailtoshowvalidationok@gmail.com'  
+            from_email = 'mailtoshowvalidationok@gmail.com'  # Update with your email
             recipient_list = [user.email]
 
             send_mail(subject, message, from_email, recipient_list, fail_silently=False)
@@ -156,7 +164,7 @@ def change_status(request, user_id):
             # Send a deactivation email
             subject = 'Account Deactivation'
             message = render_to_string('deactivation_email.html', {'user': user})
-            from_email = 'mailtoshowvalidationok@gmail.com' 
+            from_email = 'mailtoshowvalidationok@gmail.com'  # Update with your email
             recipient_list = [user.email]
 
             send_mail(subject, message, from_email, recipient_list, fail_silently=False)
@@ -165,6 +173,9 @@ def change_status(request, user_id):
         messages.success(request, f'Status for {user.username} has been changed to {new_status}.')
     
     return redirect('customer_list')
+
+
+
 
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -206,6 +217,7 @@ def deactivate_user(request, user_id):
     return redirect('customer_list')
 
 
+
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
@@ -242,11 +254,46 @@ def activate_user(request, user_id):  # Update the function name to be consisten
     return redirect('customer_list')
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def contact(request):
     return render(request, 'contact.html')
 
 def adminprofile(request):
     return render(request, 'adminprofile.html')
+
 
 
 def delete_product(request, product_id):
@@ -260,10 +307,79 @@ def delete_product(request, product_id):
             pass
     return redirect('viewproduct')  # Redirect back to the product list view
 
+
+
+def add_product(request):
+    if request.method == 'POST':
+        # Handle the form submission
+        product_name = request.POST.get('product-name')
+        category = request.POST.get('category-name')
+        subcategory = request.POST.get('subcategory-name')
+        quantity = request.POST.get('quantity')
+        description = request.POST.get('description')
+        price = float(request.POST.get('price', 0))
+        discount = float(request.POST.get('discount', 0))
+        status = request.POST.get('status')
+        product_image = request.FILES.get('product-image')
+        making_charge = float(request.POST.get('making-charge', 0))
+        gold_value = float(request.POST.get('gold-value', 0))
+        stone_cost = float(request.POST.get('stone-cost', 0))
+        gst_rate = float(request.POST.get('gst-rate', 0))
+        gold_weight = float(request.POST.get('gold-weight', 0))  # Fetch gold_weight from the form
+
+        # Calculate discounted price
+        discounted_price = price - (price * (discount / 100))
+
+        # Calculate sale_price
+        sale_price = discounted_price + making_charge + (gold_value * gold_weight) + stone_cost  # Include gold_weight in the calculation
+
+        # Calculate GST amount
+        gst_amount = sale_price * (gst_rate / 100)
+
+        # Calculate sale_price_with_gst
+        sale_price_with_gst = sale_price + gst_amount
+
+        # Retrieve the purity of gold
+        purity_of_gold = request.POST.get('purity-of-gold')
+
+        # Create a new Product object and save it to the database
+        product = Product(
+            product_name=product_name,
+            category=category,
+            subcategory=subcategory,
+            quantity=quantity,
+            description=description,
+            price=price,
+            discount=discount,
+            sale_price=sale_price_with_gst,
+            status=status,
+            product_image=product_image,
+            purity_of_gold=purity_of_gold,
+            making_charge=making_charge,
+            gold_value=gold_value,
+            stone_cost=stone_cost,
+            gst_rate=gst_rate,
+            gold_weight=gold_weight,  # Include gold_weight in the model field
+        )
+        product.save()
+
+        # Redirect to a success page or any other desired action
+        return redirect('adminpage')
+
+    return render(request, 'adminpage.html')
+
+
 def view_product(request):
     products = Product.objects.all()  # Retrieve all products from the database
     return render(request, 'viewproduct.html', {'products': products})
 
+
+
+
+
+
+
+# views.py
 from django.shortcuts import render, get_object_or_404
 from .models import Product
 from django.http import JsonResponse
@@ -282,6 +398,9 @@ def adminpage(request):
     
     # Render the HTML template
     return render(request, 'adminpage.html', context)
+
+
+
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -319,7 +438,7 @@ def edit_product(request, product_id):
 
     if request.method == 'POST':
         try:
-            
+            # Handle the form submission
             product.product_name = request.POST.get('product-name')
             product.category = request.POST.get('category-name')
             product.subcategory = request.POST.get('subcategory-name')
@@ -330,7 +449,7 @@ def edit_product(request, product_id):
             product.status = request.POST.get('status')
             product_image = request.FILES.get('product-image')
 
-            
+            # Only update the product image if a new image is provided
             if product_image:
                 product.product_image = product_image
 
@@ -340,24 +459,116 @@ def edit_product(request, product_id):
             product.stone_cost = float(request.POST.get('stone-cost', 0))
             product.gst_rate = float(request.POST.get('gst-rate', 0))
 
-            
+            # Retrieve the purity of gold
             product.purity_of_gold = request.POST.get('purity-of-gold')
 
-            
+            # Calculate sale price
             product.calculate_sale_price()
 
-            
+            # Save the updated product to the database
             product.save()
 
-            
+            # Redirect to a success page or any other desired action
             return redirect('adminpage')
 
         except Exception as e:
-            
+            # Print the exception for debugging
             print(f"An error occurred: {e}")
 
     return render(request, 'edit_product.html', {'product': product})
 
+
+def product_details(request, product_id):
+    product = get_object_or_404(Product, product_id=product_id)
+    return render(request, 'product_details.html', {'product': product})
+
+
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import ShoppingCart
+
+@login_required
+def view_cart(request, product_id=None):
+    cart_items = ShoppingCart.objects.filter(user=request.user)
+
+    total_price = calculate_total_price(cart_items)
+    
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        new_quantity = request.POST.get('new_quantity')
+
+        # Update the quantity in the database
+        cart_item = ShoppingCart.objects.get(id=item_id)
+        cart_item.quantity = new_quantity
+        cart_item.save()
+
+        # Redirect back to the cart page
+        return redirect('view_cart')
+
+    return render(request, 'view_cart.html', {'cart_items': cart_items, 'total_price': total_price})
+
+
+def calculate_total_price(cart_items):
+    total_price = 0
+    for item in cart_items:
+        total_price += item.product.sale_price * item.quantity
+    return total_price
+
+
+
+
+
+
+
+
+
+
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import ShoppingCart
+
+def remove_from_cart(request, item_id):
+    # Get the shopping cart item or raise a 404 error if not found
+    cart_item = get_object_or_404(ShoppingCart, id=item_id, user=request.user)
+
+    # Delete the item from the cart
+    cart_item.delete()
+
+    # Redirect to the shopping cart page after removing the item
+    messages.success(request, 'Item removed from the cart.')
+    return redirect('view_cart', product_id=cart_item.product.product_id)
+
+
+
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from .models import Product, ShoppingCart
+
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, product_id=product_id)
+
+    # Check if the user is authenticated
+    if request.user.is_authenticated:
+        user = request.user
+
+        # Check if the product is already in the user's cart
+        cart_item, created = ShoppingCart.objects.get_or_create(user=user, product=product)
+
+        # No need to increment quantity, just add the product to the cart
+        if created:
+            messages.success(request, 'Item added to the cart.')
+        else:
+            messages.warning(request, 'Item is already in the cart.')
+
+        return redirect('view_cart', product_id=product_id)
+    else:
+        messages.warning(request, 'Please log in to add items to your cart.')
+        return redirect('login')  # Redirect to the login page if the user is not authenticated
 
 
 
@@ -386,6 +597,153 @@ def subcategory_view(request):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from razorpay import Client
+from .models import ShoppingCart
+
+razorpay_api_key = settings.RAZORPAY_API_KEY
+razorpay_secret_key = settings.RAZORPAY_API_SECRET
+
+razorpay_client = Client(auth=(razorpay_api_key, razorpay_secret_key))
+from .models import OrderedProduct
+
+@csrf_exempt
+def rentnxt(request):
+    cart_items_data = request.POST.getlist('cart_items[]')
+    user = request.user
+
+    for item_data in cart_items_data:
+        product_id = int(item_data)
+        product = Product.objects.get(pk=product_id)
+        total_price = product.sale_price
+        OrderedProduct= OrderedProduct.objects.create(
+            user=user,
+            product=product,
+            total_price=total_price
+        )
+    
+    cart_items = ShoppingCart.objects.filter(user=request.user)
+    total_price = calculate_total_price(cart_items)
+
+    amount = int(total_price * 100)
+
+    order_data = {
+        'amount': amount,
+        'currency': 'INR',
+        'receipt': 'order_rcptid_11',
+        'payment_capture': '1',  # Auto-capture payment
+    }
+
+    order = razorpay_client.order.create(data=order_data)
+    callback_url = 'paymenthandler/'
+
+    context = {
+        'razorpay_api_key': razorpay_api_key,
+        'amount': order_data['amount'],
+        'currency': order_data['currency'],
+        'order_id': order['id'],
+        'callback_url' : callback_url
+    }
+    
+    return render(request, 'payment.html', context)
+
+from django.shortcuts import render
+import razorpay
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponseBadRequest
+ 
+@csrf_exempt
+def paymenthandler(request):
+ 
+    # only accept POST request.
+    if request.method == "POST":
+        try:
+           
+            # get the required parameters from post request.
+            payment_id = request.POST.get('razorpay_payment_id', '')
+            razorpay_order_id = request.POST.get('razorpay_order_id', '')
+            signature = request.POST.get('razorpay_signature', '')
+            params_dict = {
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': signature
+            }
+ 
+            # verify the payment signature.
+            result = razorpay_client.utility.verify_payment_signature(
+                params_dict)
+            if result is not None:
+                
+                try:
+ 
+                    # capture the payemt
+                    razorpay_client.payment.capture(payment_id)
+ 
+                    # render success page on successful caputre of payment
+                    return render(request, 'paymentsuccess.html')
+                except:
+ 
+                    # if there is an error while capturing payment.
+                    return render(request, 'paymentfail.html')
+            else:
+ 
+                # if signature verification fails.
+                return render(request, 'paymentfail.html')
+        except:
+ 
+            # if we don't find the required parameters in POST data
+            return HttpResponseBadRequest()
+    else:
+       # if other than POST request is made.
+        return HttpResponseBadRequest()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+def process_payment(request):
+    if request.method == 'POST':
+        order = OrderedProduct.objects.filter(user=request.user).first()
+        order.save()
+        return redirect('order_confirmation')
+    return render(request, 'payment.html')
+
+
+
 from django.shortcuts import render, redirect
 from .models import Feedback
 
@@ -402,10 +760,10 @@ def feedback_submit(request):
             subject=subject,
             message=message
         )
-       
-        return redirect('contact')  
+        # Optionally, you can add some logic here such as sending a confirmation email or redirecting to a thank you page.
+        return redirect('contact')  # Replace 'thank_you_page' with the name of your thank you page URL
     else:
-       
+        # Handle GET request if needed
         pass
 
 
@@ -415,6 +773,34 @@ from .models import Feedback
 def feedback_list(request):
     feedbacks = Feedback.objects.all()
     return render(request, 'feedback_list.html', {'feedbacks': feedbacks})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 from django.shortcuts import render
 from .models import UserProfile
@@ -446,6 +832,11 @@ def change_staff_status(request, staff_id):
         staff_member.save()
 
     return redirect('staff_list')
+
+
+
+
+
 
 
 from django.core.mail import send_mail
@@ -519,222 +910,12 @@ def send_deactivation_email(user):
     send_mail(subject, strip_tags(html_message), from_email, recipient_list, html_message=html_message)
 
 
-    
-    
-    
-
-
-
-    
-    
-
-
-
-
-
-
-
-
-
-
-    
-
-
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import letter
-from django.template.loader import render_to_string
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image, Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
-
-def generate_pdf(request, gold_item_id):
-    
-    gold_item = get_object_or_404(GoldItemNew, pk=gold_item_id)
-    product = gold_item.product 
-
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="gold_item_details_{gold_item_id}.pdf"'
-
-    doc = SimpleDocTemplate(response, pagesize=letter, rightMargin=inch/2, leftMargin=inch/2, topMargin=inch/2, bottomMargin=inch/2)
-    elements = []
-
-    header_text = '<font size="24" color="red"><b>THANGAM JEWELLERY</b></font>'
-    header_style = getSampleStyleSheet()['Title']
-    header_paragraph = Paragraph(header_text, header_style)
-    elements.append(header_paragraph)
- 
-    elements.append(Spacer(1, 24))  
-
-    product_image = Image(product.product_image.path, width=100, height=100)
-    elements.append(product_image)
-
-    elements.append(Spacer(1, 12))  
-
-    product_details = [
-        ["Product Name", product.product_name],
-        ["Gold Weight", f"{gold_item.weight} Grams"],
-        ["Purity of Gold", product.purity_of_gold],
-        ["Volume", gold_item.volume],
-        ["predicted_purity_percentage (%)", f"{product.predicted_purity_percentage}%"],
-    ]
-    details_table = Table(product_details, style=[
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-        ('FONT_SIZE', (0, 0), (-1, -1), 12),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.black),
-        ('BOX', (0, 0), (-1, -1), 0.5, colors.black),
-    ])
-    elements.append(details_table)
-    elements.append(Spacer(1, 12)) 
-
-    description_text = """
-    <b>Gold Weight:</b><br/>
-    Refers to the mass of the gold, typically measured in grams (g) or ounces (oz).<br/>
-    The weight of gold determines its value, with heavier pieces generally being more valuable.<br/>
-    Used in calculations to determine the overall value of gold items.<br/><br/>
-
-    <b>Purity of Gold:</b><br/>
-    Denoted in karats (K) or fineness, indicating the proportion of pure gold in an alloy.<br/>
-    Common purities include 24K (99.9% pure), 22K (91.7% pure), and 18K (75% pure), among others.<br/>
-    Higher purity gold typically has a brighter yellow color and is more valuable but may also be softer and less durable.<br/><br/>
-
-    <b>Volume of Gold:</b><br/>
-    Represents the space occupied by the gold, measured in cubic centimeters (cm³) or milliliters (ml).<br/>
-    Determined by measuring the length, width, and height of the gold object or by displacement in a liquid.<br/>
-    Used in density calculations to predicted_purity_percentage when combined with weight.<br/><br/>
-
-    <b>predicted_purity_percentage (%):</b><br/>
-    Calculated based on the gold's weight, volume, and density.<br/>
-    Provides an approximation of the gold's purity, often expressed as a percentage.<br/>
-    Helpful for assessing the value and quality of gold items, especially when purity testing methods are unavailable or impractical.<br/>
-    """
-    description_box = Paragraph(description_text, getSampleStyleSheet()['Normal'])
-    elements.append(description_box)
-
-    # Build the PDF
-    doc.build(elements)
-
-    return response
-
-  
-    
-from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-
-
-def product_pdf(request, gold_item_id):
-    gold_item = get_object_or_404(GoldItemNew, pk=gold_item_id)
-    product = gold_item.product 
-
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="gold_item_details_{gold_item_id}.pdf"'
-
-    doc = SimpleDocTemplate(response, pagesize=letter, rightMargin=inch/2, leftMargin=inch/2, topMargin=inch/2, bottomMargin=inch/2)
-    elements = []
-
-    header_text = '<font size="24" color="red"><b>THANGAM JEWELLERY</b></font>'
-    header_style = getSampleStyleSheet()['Title']
-    header_paragraph = Paragraph(header_text, header_style)
-    elements.append(header_paragraph)
- 
-    elements.append(Spacer(1, 24))  
-
-    product_image = Image(product.product_image.path, width=100, height=100)
-    elements.append(product_image)
-
-    elements.append(Spacer(1, 12))  
-
-    product_details = [
-        ["Product Name", product.product_name],
-        ["Gold Weight", f"{gold_item.weight} Grams"],
-        ["Purity of Gold", product.purity_of_gold],
-        ["Volume", gold_item.volume],
-        ["predicted_purity_percentage (%)", f"{product.predicted_purity_percentage}%"],
-    ]
-    details_table = Table(product_details, style=[
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-        ('FONT_SIZE', (0, 0), (-1, -1), 12),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-        ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.black),
-        ('BOX', (0, 0), (-1, -1), 0.5, colors.black),
-    ])
-    elements.append(details_table)
-    elements.append(Spacer(1, 12)) 
-
-    description_text = """
-    <b>Gold Weight:</b><br/>
-    Refers to the mass of the gold, typically measured in grams (g) or ounces (oz).<br/>
-    The weight of gold determines its value, with heavier pieces generally being more valuable.<br/>
-    Used in calculations to determine the overall value of gold items.<br/><br/>
-
-    <b>Purity of Gold:</b><br/>
-    Denoted in karats (K) or fineness, indicating the proportion of pure gold in an alloy.<br/>
-    Common purities include 24K (99.9% pure), 22K (91.7% pure), and 18K (75% pure), among others.<br/>
-    Higher purity gold typically has a brighter yellow color and is more valuable but may also be softer and less durable.<br/><br/>
-
-    <b>Volume of Gold:</b><br/>
-    Represents the space occupied by the gold, measured in cubic centimeters (cm³) or milliliters (ml).<br/>
-    Determined by measuring the length, width, and height of the gold object or by displacement in a liquid.<br/>
-    Used in density calculations to predicted_purity_percentage when combined with weight.<br/><br/>
-
-    <b>predicted_purity_percentage (%):</b><br/>
-    Calculated based on the gold's weight, volume, and density.<br/>
-    Provides an approximation of the gold's purity, often expressed as a percentage.<br/>
-    Helpful for assessing the value and quality of gold items, especially when purity testing methods are unavailable or impractical.<br/>
-    """
-    description_box = Paragraph(description_text, getSampleStyleSheet()['Normal'])
-    elements.append(description_box)
-
-    # Build the PDF
-    doc.build(elements)
-
-    return response
-
-
-
-
-
-
-from django.http import JsonResponse
-from userapp.models import GoldItemNew
-
-def product_data_endpoint_view(request):
-    # Fetch all GoldItemNew objects
-    gold_items = GoldItemNew.objects.all()
-
-    # Prepare data for the graph
-    product_data = {
-        'labels': [],
-        'data': {
-            'weight': [],
-            'volume': [],
-            'purity_of_gold': [],
-            'predicted_purity_percentage': [],
-        }
-    }
-
-    # Populate the data dictionary
-    for item in gold_items:
-        product_data['labels'].append(item.product.product_name)
-        product_data['data']['weight'].append(item.weight)
-        product_data['data']['volume'].append(item.volume)
-        product_data['data']['purity_of_gold'].append(item.product.purity_of_gold)
-        product_data['data']['predicted_purity_percentage'].append(item.predicted_purity_percentage)
-
-    # Return the data as JSON response
-    return JsonResponse(product_data)
-
-
-
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 @login_required
-def manage(request):
+def update_customer_info(request):
     if request.method == 'POST':
         user = request.user
         user.username = request.POST.get('name')
@@ -744,256 +925,34 @@ def manage(request):
         user.address = request.POST.get('address')
         user.save()
         messages.success(request, 'Your information has been updated successfully.')
-        return redirect('manage')  # Redirect to the 'manage' URL pattern after updating
-    return render(request, 'manage.html')  # Render the 'manage.html' template for GET requests
-
-
-
-
-
-
-
-
-def product_details(request, product_id):
-    request.session['product_id'] = product_id
-    product = get_object_or_404(Product, product_id=product_id)  # Use 'product_id' instead of 'id'
-    amount=product.sale_price
-    
-    # Create a Razorpay Order
-    razorpay_client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
-    currency = 'INR'
-    amount = int(amount * 100)
-
-    razorpay_order = razorpay_client.order.create(dict(amount=amount, currency=currency, payment_capture='0'))
-    
-    # Get the order ID of the newly created order
-    razorpay_order_id = razorpay_order['id']
-    callback_url = '/paymenthandler/'  # Make sure to provide the correct callback URL
-    
-    # Pass necessary details to the frontend
-    context = {
-        'product': product,
-        'razorpay_order_id': razorpay_order_id,
-        'razorpay_merchant_key': settings.RAZOR_KEY_ID,
-        'razorpay_amount': amount,
-        'currency': currency,
-        'callback_url': callback_url,
-    }
-    
-    return render(request, 'product_details.html', context=context)
-
-
-from django.shortcuts import render
-import razorpay
-from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponseBadRequest
-
-razorpay_client = razorpay.Client(
-    auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
-
-@csrf_exempt
-def paymenthandler(request):
-    if request.method == "POST":
-        try:
-            payment_id = request.POST.get('razorpay_payment_id', '')
-            razorpay_order_id = request.POST.get('razorpay_order_id', '')
-            signature = request.POST.get('razorpay_signature', '')
-            print(payment_id,razorpay_order_id)
-
-            # Verify the payment signature
-            params_dict = {
-                'razorpay_order_id': razorpay_order_id,
-                'razorpay_payment_id': payment_id,
-                'razorpay_signature': signature
-            }
-            result = razorpay_client.utility.verify_payment_signature(params_dict)
-            
-            print(result)
-            
-            if result is not None:
-                # Capture the payment
-                print(payment_id)
-                product_id = request.session.get('product_id')
-                product = get_object_or_404(Product, product_id=product_id)
-                print(product.product_name)
-                print(request.user)
-               
-                
-
-                # Save payment details to database
-                payment = Payment.objects.create(
-                    user=request.user,  # Assuming user is logged in
-                    product=product,
-                    razorpay_payment_id=payment_id,
-                    razorpay_order_id=razorpay_order_id,
-                    razorpay_signature="hhhhhhhhhhh",
-                    payment_status='Success',  # Assuming payment is successful
-                )
-                
-                
-                # Render success page
-                # return render(request, 'payment_success.html', {'payment': payment})
-                return redirect('orderdetails')
-            else:
-                # If signature verification fails
-                return HttpResponse("FAIL")
-        except:
-            # Handle exceptions
-            return HttpResponse("fail")
+        return redirect('loginview')  # Redirect to the user's profile page
     else:
-        # Handle non-POST requests
-        return HttpResponse("nothing")
+        return redirect('loginview')  # Redirect to home if accessed via GET request
     
     
     
-def orderdetails(request):
-    payments = Payment.objects.filter(user=request.user)
-
-    context = {
-        'payments': payments
-    }
-    return render(request, 'payment_success.html',context)
-
-
-
-def payment_success(request):
-    payments = Payment.objects.filter(user=request.user)
-    payment_id = 123
-    context = {
-        'payments': payments,
-        'payment_id': payment_id,
-    }
-    return render(request, 'payment_success.html', context)
-
-
     
-    
-    
-from .models import CustomUser, Payment 
+from django.shortcuts import render
+from .models import CustomUser
 
 def order_list(request):
-    
-    
+    # Retrieve customers
     customers = CustomUser.objects.filter(user_type=CustomUser.CUSTOMER)
-    for customer in customers:
-        customer.orders = Payment.objects.filter(user=customer)  # Filter payments by user (customer)
-        
     return render(request, 'order_list.html', {'customers': customers})
 
 
 
 
-from django.http import HttpResponse
-from django.template.loader import get_template
-from xhtml2pdf import pisa
-from .models import Payment
 
-def generate_pdf_bill(request, payment_id):
-    try:
-        # Fetch payment details based on payment_id
-        payment = Payment.objects.get(id=payment_id)
-
-        # Ensure purity is a 6-digit value
-        purity = payment.product.predicted_purity_percentage
-        if len(str(purity)) > 6:
-            purity = str(purity)[:6]
-
-        context = {
-            'num_of_products': payment.product.quantity,
-            'product_name': payment.product.product_name,
-            'price': payment.product.price,
-            'discount': payment.product.discount,
-            'making_charge': payment.product.making_charge,
-            'gold_value': payment.product.gold_value,
-            'gold_weight': payment.product.gold_weight,
-            'stone_cost': payment.product.stone_cost,
-            'gst_rate': payment.product.gst_rate,
-            'total_price': payment.product.sale_price,
-            'purity': purity,  # Use the adjusted purity value
-            'payment_date': payment.payment_date.strftime("%d-%b-%Y"),
-        }
-
-        # Render HTML template with context
-        template = get_template('bill.html')
-        html = template.render(context)
-
-        # Create a PDF response
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="bill.pdf"'
-
-        # Convert HTML to PDF
-        pisa_status = pisa.CreatePDF(html, dest=response)
-        if pisa_status.err:
-            return HttpResponse('Error generating PDF', status=500)
-
-        return response
-
-    except Payment.DoesNotExist:
-        return HttpResponse("Payment not found.", status=404)
+def bill(request, product_id):
+    product = Product.objects.get()
+    return render(request, 'bill.html', {'product': product})
 
 
 
+from django.shortcuts import render
+from .models import OrderedProduct
 
-
-
-
-
-def add_product(request):
-    if request.method == 'POST':
-        # Handle the form submission
-        product_name = request.POST.get('product-name')
-        category = request.POST.get('category-name')
-        subcategory = request.POST.get('subcategory-name')
-        quantity = request.POST.get('quantity')
-        description = request.POST.get('description')
-        price = float(request.POST.get('price', 0))
-        discount = float(request.POST.get('discount', 0))
-        status = request.POST.get('status')
-        product_image = request.FILES.get('product-image')
-        making_charge = float(request.POST.get('making-charge', 0))
-        gold_value = float(request.POST.get('gold-value', 0))
-        stone_cost = float(request.POST.get('stone-cost', 0))
-        gst_rate = float(request.POST.get('gst-rate', 0))
-        gold_weight = float(request.POST.get('gold-weight', 0))  # Fetch gold_weight from the form
-
-        # Calculate discounted price
-        discounted_price = price - (price * (discount / 100))
-
-        # Calculate sale_price
-        sale_price = discounted_price + making_charge + (gold_value * gold_weight) + stone_cost  # Include gold_weight in the calculation
-
-        # Calculate GST amount
-        gst_amount = sale_price * (gst_rate / 100)
-
-        # Calculate sale_price_with_gst
-        sale_price_with_gst = sale_price + gst_amount
-
-        # Retrieve the purity of gold
-        purity_of_gold = request.POST.get('purity-of-gold')
-
-        # Create a new Product object and save it to the database
-        product = Product(
-            product_name=product_name,
-            category=category,
-            subcategory=subcategory,
-            quantity=quantity,
-            description=description,
-            price=price,
-            discount=discount,
-            sale_price=sale_price_with_gst,
-            status=status,
-            product_image=product_image,
-            purity_of_gold=purity_of_gold,
-            making_charge=making_charge,
-            gold_value=gold_value,
-            stone_cost=stone_cost,
-            gst_rate=gst_rate,
-            gold_weight=gold_weight,  # Include gold_weight in the model field
-        )
-        product.save()
-
-        # Redirect to a success page or any other desired action
-        return redirect('adminpage')
-
-    return render(request, 'adminpage.html')
+def ordered_product_list(request):
+    ordered_products = OrderedProduct.objects.filter(user=request.user)
+    return render(request, 'ordered_product_list.html', {'ordered_products': ordered_products})

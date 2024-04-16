@@ -245,16 +245,7 @@
             <div class="account-box">
                 <a href="{% url 'feedback_list' %}" class="content-item">FEEDBACK</a>
             </div>
-            
         </div>
-        <div class="sidebar-item">
-            {% comment %} ORDERS {% endcomment %}
-            <div class="account-box">
-                <a href="{% url 'calculate_purity' %}" class="content-item">PURITY OF GOLD </a>
-            </div>
- 
-        </div>
-
         <div class="sidebar-item">
             PRODUCT
             <div class="account-box">
@@ -283,10 +274,10 @@
             <table class="table">
                 <thead>
                 <tr>
-                    {% comment %} <th>No.</th> {% endcomment %}
+                    <th>No.</th>
                     <th>Product Name</th>
-                    {% comment %} <th>Category</th>
-                    <th>Subcategory</th> {% endcomment %}
+                    <th>Category</th>
+                    <th>Subcategory</th>
                     <th>Purity</th>
                     <th>Quantity</th>
                     <th>Description</th>
@@ -294,7 +285,7 @@
                     <th>Discount (%)</th>
                     <th>Making Charge</th>
                     <th>Gold Value</th>
-                    <th>Gold Weight</th>   
+                    <th>Gold Weight</th>
                     <th>Stone Cost</th>
                     <th>GST</th>
                     <th>Total Price</th>
@@ -306,10 +297,10 @@
                 <tbody>
                 {% for product in products %}
                     <tr>
-                        {% comment %} <td>{{ forloop.counter }}</td> {% endcomment %}
+                        <td>{{ forloop.counter }}</td>
                         <td>{{ product.product_name }}</td>
-                        {% comment %} <td>{{ product.category }}</td>
-                        <td>{{ product.subcategory }}</td> {% endcomment %}
+                        <td>{{ product.category }}</td>
+                        <td>{{ product.subcategory }}</td>
                         <td>{{ product.purity_of_gold }}</td>
                         <td>{{ product.quantity }}</td>
                         <td>{{ product.description }}</td>
@@ -317,7 +308,7 @@
                         <td>{{ product.discount }}%</td>
                         <td>₹{{ product.making_charge }}</td>
                         <td>₹{{ product.gold_value }}</td>
-                        <td>{{ product.gold_weight }} grams</td>    
+                        <td>{{ product.gold_weight }} grams</td>
                         <td>₹{{ product.stone_cost }}</td>
                         <td>₹{{ product.gst_rate }}</td>
                         <td>₹{{ product.sale_price }}</td>
@@ -334,10 +325,7 @@
                             <a href="{% url 'edit_product' product_id=product.product_id %}" class="edit-button">Edit</a>
                         </td>
                         <td>
-                            <form action="{% url 'delete_product' product_id=product.product_id %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="delete-button">Delete</button>
-                            </form>
+                           
                         </td>
                     </tr>
                 {% endfor %}
