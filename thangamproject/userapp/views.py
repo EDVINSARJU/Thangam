@@ -938,15 +938,22 @@ def generate_pdf_bill(request, payment_id):
 
 
 
+import pandas as pd
 from django.shortcuts import render, redirect
 from .models import Product, GoldItemNew
-
-
+from sklearn.linear_model import LinearRegression
+import numpy as np
 from django.http import JsonResponse
 
 
 
+# Load the dataset from the CSV file in your PyCharm project directory
+csv_file_path = r''
+data = pd.read_csv(csv_file_path)
 
+# Train the linear regression model
+model = LinearRegression()
+model.fit(data[['Weight (grams)', 'Volume (cm³)']], data['Purity Percentage (%)'])
 
 def add_product(request):
     if request.method == 'POST':
@@ -1061,7 +1068,10 @@ def predict_purity(request):
     
 
 # views.py
-
+import pandas as pd
 from django.http import JsonResponse
 
-
+def load_csv_data(request):
+    csv_file_path = r''
+    data = pd.read_csv(csv_file_path)
+    return JsonResponse(data.to_dict('records'), safe=False)
